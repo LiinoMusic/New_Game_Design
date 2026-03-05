@@ -4,7 +4,7 @@ pygame.init()
 #Window
 RESOLUTION = WIDTH, HEIGHT = (1080, 720)
 SCREEN = pygame.display.set_mode(RESOLUTION)
-backgroundcolor = (0,0,0)
+backgroundcolor = (55, 174, 15)
 game_is_running = True
 
 #Sprite
@@ -13,12 +13,20 @@ FRAME_WIDTH = FRAME_HEIGHT  = 64
 player_width, player_height = FRAME_WIDTH * SCALE, FRAME_HEIGHT * SCALE
 Spritesheet = pygame.image.load("Swordsman_lvl3_Idle_with_shadow.png")
 Spritesheet = Spritesheet.convert_alpha()
-Sprite = Spritesheet.subsurface(pygame.Rect(0, 0, FRAME_WIDTH, FRAME_HEIGHT))
-Sprite = pygame.transform.scale(Sprite, (player_width, player_height))
+
+Sprites = []
+animation_index = 0
+for i in range(12):
+    Sprite = Spritesheet.subsurface(pygame.Rect(FRAME_WIDTH * i, 0, FRAME_WIDTH, FRAME_HEIGHT))
+    Sprite = pygame.transform.scale(Sprite, (player_width, player_height))
+    Sprites.append(Sprite)
+
+animation_index = 0
+
 
 #player
 player = pygame.Rect(WIDTH//2, HEIGHT//2, player_width, player_height)
-player_speed = (15)
+player_speed = (30)
 player_color = (256, 200, 0)
 
 #Floor
@@ -35,6 +43,7 @@ jump_stength = -20
 #CLock
 clock = pygame.time.Clock()
 FPS = (60)
+animation_timer = 0
 
 #Game Loop
 while game_is_running:
@@ -62,7 +71,7 @@ while game_is_running:
         player.x += player_speed
     if keys[pygame.K_SPACE]:
         player.y += jump_stength
-    
+
     #if player went out of map
     if player.y >= HEIGHT - player_height//1.3:
         player.y = HEIGHT - player_height//1.3
@@ -73,13 +82,18 @@ while game_is_running:
     if player.x <= 0:
         player.x = 0
 
-    #gravity
-    #velocity_y += gravity
-    #player.y += velocity_y
-
     #Screen
-    SCREEN.blit(Sprite, player.topleft)
+    SCREEN.blit(Sprites[(animation_index)], player.topleft)
     pygame.draw.rect(SCREEN, floor_color, floor)
     pygame.display.flip()
+
+    if animation_timer == 10:
+        animation_index += 1
+        if animation_index > 11:
+            animation_index = 0
+
+        animation_timer = 0
+
+    animation_timer += 1
 
 pygame.quit

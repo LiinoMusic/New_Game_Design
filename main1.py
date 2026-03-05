@@ -64,8 +64,14 @@ while game_is_running:
         player.y += jump_stength
     
     #if player went out of map
-    if player.y >= HEIGHT - player_height//1.25:
-        player.y = HEIGHT - player_height//1.25
+    if player.y >= HEIGHT - player_height//1.3:
+        player.y = HEIGHT - player_height//1.3
+    if player.y <= 0:
+        player.y = 0
+    if player.x >= WIDTH - player_width//1.6:
+        player.x = WIDTH - player_width//1.6
+    if player.x <= 0:
+        player.x = 0
 
     #gravity
     #velocity_y += gravity

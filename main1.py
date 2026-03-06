@@ -69,6 +69,19 @@ attack_w = False
 moving = [moving_w, moving_s, moving_a, moving_d]
 attack = [attack_a, attack_d, attack_w, attack_s]
 
+#attack animation
+Sprites_attack_s = []
+Sprites_attack_w = []
+Sprites_attack_d = []
+Sprites_attack_a = []
+Spritesheet = pygame.image.load('Swordsman_lvl3_attack_with_shadow.png')
+Spritesheet = Spritesheet.convert_alpha()
+
+for i in range(8):
+    Sprite_s = Spritesheet.subsurface(FRAME_WIDTH * i, 0, FRAME_WIDTH, FRAME_WIDTH)
+    Sprite_s = pygame.transform.scale(Sprite_s, (player_width, player_height))
+    Sprites_attack_s.append(Sprite_s)
+
 #player
 player = pygame.Rect(WIDTH//2, HEIGHT//2, player_width, player_height)
 player_speed = (5)
@@ -134,6 +147,13 @@ while game_is_running:
         moving = True
     if keys[pygame.K_SPACE]:
         player.y += jump_stength
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.button == 1:
+            attack_s = True
+    if keys[pygame.K_s and event.type == pygame.MOUSEBUTTONDOWN]:
+        if event.button == 1:
+            player.y += player_speed
+            attack_s = True
 
     #if player went out of map
     if player.y >= HEIGHT - player_height//1.3:
@@ -156,6 +176,8 @@ while game_is_running:
         SCREEN.blit(Sprites_walk_w[animation_index_walk_w], player.topleft)
     elif moving_s == True:
         SCREEN.blit(Sprites_walk_s[animation_index_walk_s], player.topleft)
+    if attack_s == True:
+        SCREEN.blit(Sprites_attack_s[animation_index_attack_s], player.topleft)
     elif moving == False:
         SCREEN.blit(Sprites_Stand[animation_index_stand], player.topleft)
     pygame.draw.rect(SCREEN, floor_color, floor)

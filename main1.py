@@ -7,21 +7,17 @@ SCREEN = pygame.display.set_mode(RESOLUTION)
 backgroundcolor = (55, 174, 15)
 game_is_running = True
 
+#background 
+background = pygame.image.load("Background.png")
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+background = background.convert_alpha()
+
 n =0
 
 #Sprite standig
 SCALE = 2.5
 FRAME_WIDTH = FRAME_HEIGHT  = 64
 player_width, player_height = FRAME_WIDTH * SCALE, FRAME_HEIGHT * SCALE
-Spritesheet = pygame.image.load("Swordsman_lvl3_Idle_with_shadow.png")
-Spritesheet = Spritesheet.convert_alpha()
-
-Sprites_Stand = []
-animation_index = 0
-for i in range(12):
-    Sprite = Spritesheet.subsurface(pygame.Rect(FRAME_WIDTH * i, n, FRAME_WIDTH, FRAME_HEIGHT))
-    Sprite = pygame.transform.scale(Sprite, (player_width, player_height))
-    Sprites_Stand.append(Sprite)
 
 #player
 player = pygame.Rect(WIDTH//2, HEIGHT//2, player_width, player_height)
@@ -84,7 +80,18 @@ while game_is_running:
         Sprite_walking = Spritesheet.subsurface(pygame.Rect(FRAME_WIDTH * i, n, FRAME_WIDTH, FRAME_HEIGHT))
         Sprite_walking= pygame.transform.scale(Sprite_walking, (player_width, player_height))
         Sprites_walking.append(Sprite_walking)
-    
+
+    #Standing Sprite
+    Spritesheet = pygame.image.load("Swordsman_lvl3_Idle_with_shadow.png")
+    Spritesheet = Spritesheet.convert_alpha()
+
+    Sprites_Stand = []
+    animation_index = 0
+    for i in range(12):
+        Sprite = Spritesheet.subsurface(pygame.Rect(FRAME_WIDTH * i, n, FRAME_WIDTH, FRAME_HEIGHT))
+        Sprite = pygame.transform.scale(Sprite, (player_width, player_height))
+        Sprites_Stand.append(Sprite)
+
     #Player movement
     if keys[pygame.K_w]:
         player.y -= player_speed
@@ -113,16 +120,17 @@ while game_is_running:
     #if player went out of map
     if player.y >= HEIGHT - player_height//1.3:
         player.y = HEIGHT - player_height//1.3
-    if player.y <= 0:
-        player.y = 0
+    if player.y <= -35:
+        player.y = -35
     if player.x >= WIDTH - player_width//1.6:
         player.x = WIDTH - player_width//1.6
-    if player.x <= 0:
-        player.x = 0
+    if player.x <= -35:
+        player.x = -35
     
 
 
     #Screen
+    SCREEN.blit(background, (0, 0))
     if moving == True:
         SCREEN.blit(Sprites_walking[animation_index_walking], player.topleft)
     if attack == True:
@@ -135,7 +143,10 @@ while game_is_running:
         animation_index_stand += 1
         animation_index_walking += 1
         animation_index_attack += 1
-        if animation_index_stand > 11:
+        if n == Back:
+            if animation_index_stand > 3:
+                animation_index_stand = 0
+        elif animation_index_stand > 11:
             animation_index_stand = 0
         if animation_index_walking > 5:
             animation_index_walking = 0

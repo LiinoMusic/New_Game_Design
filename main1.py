@@ -126,32 +126,36 @@ while game_is_running:
             n = Right
 
     #if player went out of map
-    flicker = False
+    at_border = False
     if player.y >= HEIGHT - player_height//1.3:
         player.y = HEIGHT - player_height//1.3
-        flicker = True
+        at_border = True
     if player.y <= -35:
         player.y = -35
-        flicker = True
+        at_border = True
     if player.x >= WIDTH - player_width//1.6:
         player.x = WIDTH - player_width//1.6
-        flicker = True
+        at_border = True
     if player.x <= -35:
         player.x = -35
-        flicker = True
+        at_border = True
     
+    if at_border and not flicker and flicker_count == 0:
+        flicker = True
+
     #flicker timer
     if flicker:
         flicker_timer += 1
-        if flicker_timer > 15:  # höher = langsamer
+        if flicker_timer > 15:
             flicker_timer = 0
             flicker_count += 1
-        if flicker_count >= 10:  # nach 10 mal aufhören
-            flicker_count = 0
+        if flicker_count >= 3:
             flicker = False
-    else:
+            flicker_count = 3  # auf 10 lassen, nicht 0!
+    if not at_border:
+        flicker = False
         flicker_timer = 0
-        flicker_count = 0
+        flicker_count = 0  # nur resetten wenn wirklich weg vom Rand
 
     #Screen
     SCREEN.blit(background, (0, 0))

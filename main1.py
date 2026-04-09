@@ -23,6 +23,7 @@ player_width, player_height = FRAME_WIDTH * SCALE, FRAME_HEIGHT * SCALE
 player = pygame.Rect(WIDTH//2, HEIGHT//2, player_width, player_height)
 player_speed = (5)
 player_color = (255, 200, 0)
+player_state = "stand"
 
 #Index
 animation_index_stand = 0
@@ -37,16 +38,36 @@ Right = FRAME_HEIGHT * 2
 Back = FRAME_HEIGHT * 3
 
 #attack animation
+attack_sheet = pygame.image.load('Swordsman_lvl3_attack_with_shadow.png').convert_alpha()
 Sprites_attack = []
-Spritesheet = pygame.image.load('Swordsman_lvl3_attack_with_shadow.png')
-Spritesheet = Spritesheet.convert_alpha()
-
-#Attack Animation
 for i in range(8):
-    Sprite_attack = Spritesheet.subsurface(FRAME_WIDTH * i, n, FRAME_WIDTH, FRAME_WIDTH)
+    Sprite_attack = attack_sheet.subsurface(FRAME_WIDTH * i, n, FRAME_WIDTH, FRAME_WIDTH)
     Sprite_attack = pygame.transform.scale(Sprite_attack, (player_width, player_height))
     Sprites_attack.append(Sprite_attack)
 
+#Standing Sprite
+Sprites_Stand_all = {}
+Spritesheet = pygame.image.load("Swordsman_lvl3_Idle_with_shadow.png").convert_alpha()
+animation_index = 0
+for direction in [Front, Left, Right, Back]:
+    frames = []
+    for i in range(12):
+        frame = Spritesheet.subsurface(pygame.Rect(FRAME_WIDTH * i, direction, FRAME_WIDTH, FRAME_HEIGHT))
+        frame = pygame.transform.scale(frame, (player_width, player_height))
+        frames.append(frame)
+    Sprites_Stand_all[direction] = frames
+
+#Sprite wlaking
+Sprites_walking_all = {}
+walk_sheet = pygame.image.load('Swordsman_lvl3_Walk_with_shadow.png').convert_alpha()
+for direction in [Front, Left, Back, Right]:
+    frames = []
+    for i in range(6):
+        frame = walk_sheet.subsurface(pygame.Rect(FRAME_WIDTH * i, direction, FRAME_WIDTH, FRAME_HEIGHT))
+        frame = pygame.transform.scale(frame, (player_width, player_height))
+        frames.append(frame)
+    Sprites_walking_all[direction] = frames
+    
 #CLock
 clock = pygame.time.Clock()
 FPS = (60)
@@ -62,35 +83,12 @@ while game_is_running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_is_running = False
-
-    keys = pygame.key.get_pressed()
-    #Fullscreen 
-    if keys[pygame.K_F11]:
-        pygame.display.toggle_fullscreen()
-    elif (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-        pygame.display.toggle_fullscreen()
-
-    #Sprite wlaking
-    Spritesheet = pygame.image.load('Swordsman_lvl3_Walk_with_shadow.png')
-    Spritesheet = Spritesheet.convert_alpha()
-
-    #Walking animation
-    Sprites_walking = []
-    for i in range(6):
-        Sprite_walking = Spritesheet.subsurface(pygame.Rect(FRAME_WIDTH * i, n, FRAME_WIDTH, FRAME_HEIGHT))
-        Sprite_walking= pygame.transform.scale(Sprite_walking, (player_width, player_height))
-        Sprites_walking.append(Sprite_walking)
-
-    #Standing Sprite
-    Spritesheet = pygame.image.load("Swordsman_lvl3_Idle_with_shadow.png")
-    Spritesheet = Spritesheet.convert_alpha()
-
-    Sprites_Stand = []
-    animation_index = 0
-    for i in range(12):
-        Sprite = Spritesheet.subsurface(pygame.Rect(FRAME_WIDTH * i, n, FRAME_WIDTH, FRAME_HEIGHT))
-        Sprite = pygame.transform.scale(Sprite, (player_width, player_height))
-        Sprites_Stand.append(Sprite)
+        keys = pygame.key.get_pressed()
+        #Fullscreen 
+        if keys[pygame.K_F11]:
+            pygame.display.toggle_fullscreen()
+        elif (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            pygame.display.toggle_fullscreen()
 
     #Player movement
     if keys[pygame.K_w]:
@@ -111,11 +109,7 @@ while game_is_running:
         n = Right
     if event.type == pygame.MOUSEBUTTONDOWN:
         if event.button == 1:
-            attack_s = True
-    if keys[pygame.K_s and event.type == pygame.MOUSEBUTTONDOWN]:
-        if event.button == 1:
-            player.y += player_speed
-            attack = True
+                attack = True
 
     #if player went out of map
     if player.y >= HEIGHT - player_height//1.3:
@@ -132,11 +126,11 @@ while game_is_running:
     #Screen
     SCREEN.blit(background, (0, 0))
     if moving == True:
-        SCREEN.blit(Sprites_walking[animation_index_walking], player.topleft)
+        SCREEN.blit(Sprites_walking_all[n][animation_index_walking], player.topleft)
     if attack == True:
         SCREEN.blit(Sprites_attack[animation_index_attack], player.topleft)
     elif moving == False:
-        SCREEN.blit(Sprites_Stand[animation_index_stand], player.topleft)
+        SCREEN.blit(Sprites_Stand_all[n][animation_index_stand], player.topleft)
     pygame.display.flip()
 
     if animation_timer == 10:

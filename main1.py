@@ -25,6 +25,11 @@ player_speed = (5)
 player_color = (255, 200, 0)
 player_state = "stand"
 
+#flicker
+flicker = False
+flicker_timer = 0
+flicker_count = 0
+
 #Index
 animation_index_stand = 0
 animation_index_walking = 0
@@ -47,7 +52,7 @@ for direction in [Front, Left, Right, Back]:
         frame = pygame.transform.scale(frame, (player_width, player_height))
         frames.append(frame)
     Sprites_attack_all[direction] = frames
-    
+
 #Standing Sprite
 Sprites_Stand_all = {}
 Spritesheet = pygame.image.load("Swordsman_lvl3_Idle_with_shadow.png").convert_alpha()
@@ -121,20 +126,38 @@ while game_is_running:
             n = Right
 
     #if player went out of map
+    flicker = False
     if player.y >= HEIGHT - player_height//1.3:
         player.y = HEIGHT - player_height//1.3
+        flicker = True
     if player.y <= -35:
         player.y = -35
+        flicker = True
     if player.x >= WIDTH - player_width//1.6:
         player.x = WIDTH - player_width//1.6
+        flicker = True
     if player.x <= -35:
         player.x = -35
+        flicker = True
     
-
+    #flicker timer
+    if flicker:
+        flicker_timer += 1
+        if flicker_timer > 15:  # höher = langsamer
+            flicker_timer = 0
+            flicker_count += 1
+        if flicker_count >= 10:  # nach 10 mal aufhören
+            flicker_count = 0
+            flicker = False
+    else:
+        flicker_timer = 0
+        flicker_count = 0
 
     #Screen
     SCREEN.blit(background, (0, 0))
-    if attack == True:
+    if flicker and flicker_timer > 1:
+        pass
+    elif attack == True:
         SCREEN.blit(Sprites_attack_all[n][animation_index_attack], player.topleft)
     elif moving == True:
         SCREEN.blit(Sprites_walking_all[n][animation_index_walking], player.topleft)

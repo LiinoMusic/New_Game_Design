@@ -34,6 +34,8 @@ flicker_count = 0
 animation_index_stand = 0
 animation_index_walking = 0
 animation_index_attack = 0
+animation_index_walk_attack = 0
+walk_attack = False
 attack = False
 moving = False
 standing = True
@@ -42,12 +44,23 @@ Left = FRAME_HEIGHT * 1
 Right = FRAME_HEIGHT * 2
 Back = FRAME_HEIGHT * 3
 
+#walk attack animation
+Sprites_walk_attack_all = {}
+walk_attack_sheet = pygame.image.load('Swordsman_lvl3_Walk_Attack_with_shadow.png').convert_alpha()
+for direction in [Front, Left, Right, Back]:
+    frames = []
+    for i in range(6):
+        frame = walk_attack_sheet.subsurface(FRAME_WIDTH * i, direction, FRAME_WIDTH, FRAME_WIDTH)
+        frame = pygame.transform.scale(frame, (player_width, player_height))
+        frames.append(frame)
+    Sprites_walk_attack_all[direction] = frames
+
 #attack animation
 Sprites_attack_all = {}
 attack_sheet = pygame.image.load('Swordsman_lvl3_attack_with_shadow.png').convert_alpha()
 for direction in [Front, Left, Right, Back]:
     frames = []
-    for i in range(8):
+    for i in range(6):
         frame = attack_sheet.subsurface(FRAME_WIDTH * i, direction, FRAME_WIDTH, FRAME_WIDTH)
         frame = pygame.transform.scale(frame, (player_width, player_height))
         frames.append(frame)
@@ -100,28 +113,32 @@ while game_is_running:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
+                if keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_a] or keys[pygame.K_d]:
+                    walk_attack = True
+                    animation_index_walk_attack = 0
+                else:
                     attack = True
                     animation_index_attack = 0
 
     #Player movement
     if keys[pygame.K_w]:
         player.y -= player_speed
-        if not attack:
+        if not attack and not walk_attack:
             moving = True
             n = Back
     if keys[pygame.K_s]:
         player.y += player_speed
-        if not attack:
+        if not attack and not walk_attack:
             moving = True
             n = Front
     if keys[pygame.K_a]:
         player.x -= player_speed
-        if not attack:
+        if not attack and not walk_attack:
             moving = True
             n = Left
     if keys[pygame.K_d]:
         player.x += player_speed
-        if not attack:
+        if not attack and not walk_attack:
             moving = True
             n = Right
 
@@ -163,12 +180,15 @@ while game_is_running:
         pass
     elif attack == True:
         SCREEN.blit(Sprites_attack_all[n][animation_index_attack], player.topleft)
+    elif walk_attack == True:
+        SCREEN.blit(Sprites_walk_attack_all[n][animation_index_walk_attack], player.topleft)
     elif moving == True:
         SCREEN.blit(Sprites_walking_all[n][animation_index_walking], player.topleft)
     elif moving == False:
         SCREEN.blit(Sprites_Stand_all[n][animation_index_stand], player.topleft)
     pygame.display.flip()
 
+    #animation timers
     if animation_timer == 10:
         animation_index_stand += 1
         animation_index_walking += 1
@@ -181,10 +201,15 @@ while game_is_running:
             animation_index_walking = 0
         if attack:
             animation_index_attack += 1
-            if animation_index_attack > 7:
+            if animation_index_attack > 5:
                 animation_index_attack = 0
                 attack = False
+        if walk_attack:
+            animation_index_walk_attack += 1
+            if animation_index_walk_attack > 5:
+                animation_index_walk_attack = 0
+                walk_attack = False
         animation_timer = 0
     animation_timer += 1
 
-pygame.quit
+pygame.quit()

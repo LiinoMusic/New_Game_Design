@@ -35,10 +35,12 @@ animation_index_stand = 0
 animation_index_walking = 0
 animation_index_attack = 0
 animation_index_walk_attack = 0
+animation_index_hurt = 0
 walk_attack = False
 attack = False
 moving = False
 standing = True
+hurt = False
 Front = FRAME_HEIGHT * 0
 Left = FRAME_HEIGHT * 1
 Right = FRAME_HEIGHT * 2
@@ -88,7 +90,18 @@ for direction in [Front, Left, Back, Right]:
         frame = pygame.transform.scale(frame, (player_width, player_height))
         frames.append(frame)
     Sprites_walking_all[direction] = frames
-    
+
+#hurt animation
+Sprites_hurt_all = {}
+hurt_sheet = pygame.image.load('Swordsman_lvl3_Hurt_with_shadow.png').convert_alpha()
+for direction in [Front, Back, Left, Right]:
+    frames = []
+    for i in range(4):
+        frame = hurt_sheet.subsurface(pygame.Rect(FRAME_WIDTH * i, direction, FRAME_WIDTH, FRAME_HEIGHT))
+        frame = pygame.transform.scale(frame, (player_width, player_height))
+        frames.append(frame)
+    Sprites_hurt_all[direction] = frames
+
 #CLock
 clock = pygame.time.Clock()
 FPS = (60)
@@ -147,15 +160,19 @@ while game_is_running:
     if player.y >= HEIGHT - player_height//1.3:
         player.y = HEIGHT - player_height//1.3
         at_border = True
+        hurt = True
     if player.y <= -35:
         player.y = -35
         at_border = True
+        hurt = True
     if player.x >= WIDTH - player_width//1.6:
         player.x = WIDTH - player_width//1.6
         at_border = True
+        hurt = True
     if player.x <= -35:
         player.x = -35
         at_border = True
+        hurt = True
     
     if at_border and not flicker and flicker_count == 0:
         flicker = True
@@ -178,6 +195,8 @@ while game_is_running:
     SCREEN.blit(background, (0, 0))
     if flicker and flicker_timer > 1:
         pass
+    elif hurt == True:
+        SCREEN.blit(Sprites_hurt_all[n][animation_index_hurt], player.topleft)
     elif attack == True:
         SCREEN.blit(Sprites_attack_all[n][animation_index_attack], player.topleft)
     elif walk_attack == True:
@@ -209,6 +228,11 @@ while game_is_running:
             if animation_index_walk_attack > 5:
                 animation_index_walk_attack = 0
                 walk_attack = False
+        if hurt:
+            animation_index_hurt += 1
+            if animation_index_hurt > 3:
+                animation_index_hurt = 0
+                hurt = False
         animation_timer = 0
     animation_timer += 1
 
